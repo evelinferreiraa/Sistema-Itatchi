@@ -1,4 +1,5 @@
 from database.connection import db
+from sqlalchemy import Time
 
 class Filial(db.Model):
     __tablename__ = 'filial'
@@ -30,3 +31,9 @@ class Documento(db.Model):
     caminho_atual = db.Column(db.String(500))
     versao_atual = db.Column(db.String(20), default='1.0.0')
     status_calc = db.Column(db.String(20), default='VIGENTE')
+
+class Parametro(db.Model):
+    __tablename__ = 'parametro'
+    id = db.Column(db.Integer, primary_key=True)
+    dias_alerta_json = db.Column(db.String(255), nullable=False) 
+    hora_envio = db.Column(db.Time)
