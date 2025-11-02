@@ -1,0 +1,59 @@
+/* --- ESTILOS GLOBAIS DO SISTEMA ITATCHI (Frontend) --- */
+
+/* 1. CABEÇALHO/BARRA SUPERIOR */
+.stApp header {
+    background-color: white; 
+    height: 3.5rem;
+}
+
+/* 2. ESCONDER LOGO PADRÃO DO STREAMLIT */
+.css-1rs60co, .st-emotion-cache-1oe5f0g { 
+    visibility: hidden;
+    height: 0%;
+    position: fixed;
+}
+
+/* 3. BARRA LATERAL INTEIRA */
+section[data-testid="stSidebar"] {
+    background-color: #FF5C5C !important;
+    color: white; 
+    padding-top: 0;
+}
+
+/* 4. ESTILO DOS LINKS INTERNOS (Contraste) */
+[data-testid="stSidebarNav"] a {
+    color: white !important; 
+    font-weight: 500;
+}
+
+/* 5. ESTILO DOS LINKS INTERNOS */
+[data-testid="stSidebarNav"] > ul {
+    background-color: transparent !important; 
+    padding: 10px;
+    border-radius: 0; 
+}
+
+/* 6. ESTILO DE BOTÃO (Complementa o primaryColor) */
+div.stButton > button:first-child {
+    color: white !important; 
+}
+
+/* 7. TÍTULOS */
+h1 {
+    color: #E64A19; 
+}
+
+/* 8. CONTAINER DA LOGO */
+.logo-container {
+    position: fixed; 
+    top: 0.5rem;     
+    left: 1rem;      
+    z-index: 1000;    
+}
+
+/* 9. ESTILO DA IMAGEM */
+.logo-image {
+    height: 2.5rem; 
+    width: auto;
+    filter: brightness(0) invert(1); 
+}

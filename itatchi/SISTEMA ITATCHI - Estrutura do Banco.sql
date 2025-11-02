@@ -67,6 +67,16 @@ CREATE TABLE vinculo (
     FOREIGN KEY (documento_id) REFERENCES documento(id)
 );
 
+-- 6. Tabela: parametro
+CREATE TABLE parametro (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    -- JSON string para armazenar os dias de alerta (ex: "[15, 30, 60, 90]")
+    dias_alerta_json VARCHAR(255) NOT NULL,
+    hora_envio TIME DEFAULT NULL, -- Exemplo de outro parâmetro global
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Verificar 
 SHOW TABLES;
 
@@ -78,3 +88,7 @@ VALUES ('Regulatórios', 'CNPJ', TRUE, 365),
        ('Veículos', 'ANTT', TRUE, 180),
        ('Pessoas', 'CNH', TRUE, 365);
 
+INSERT INTO parametro (dias_alerta_json, hora_envio)
+VALUES ('[30, 60, 90]', '08:00:00');
+
+SELECT * FROM parametro;
