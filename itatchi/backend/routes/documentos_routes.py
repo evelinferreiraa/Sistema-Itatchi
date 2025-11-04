@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models.models import db, Documento
+from models.models import db, Documento, Filial, TipoDocumento 
 from datetime import datetime
 from logic.status_calculator import calcular_status
 
@@ -7,14 +7,42 @@ documento_bp = Blueprint('documento_bp', __name__)
 
 @documento_bp.route('/documentos', methods=['GET'])
 def listar_documentos():
-    documentos = Documento.query.all()
-    lista = [{
-        "id": d.id,
-        "titulo": d.titulo,
-        "responsavel": d.responsavel,
-        "validade": str(d.validade),
-        "status": d.status_calc
-    } for d in documentos]
+    # 1. Inicializa a consulta base
+    query = Documento.query
+    
+    # 2. Obtém parâmetros de filtro da URL
+    status_filtro = request.args.get('status')
+    titulo_filtro = request.args.get('titulo')
+    
+    # 3. Aplica o filtro de STATUS
+    # Apenas se o parâmetro 'status' for fornecido na URL 
+    if status_filtro:
+        query = query.filter(Documento.status_calc == status_filtro)
+    
+    # 4. Aplica o filtro de TÍTULO
+    # Apenas se o parametro 'titulo' for fornecido na URL
+    if titulo_filtro:
+        query = query.filter(Documento.titulo.ilike(f'%{titulo_filtro}%')) 
+
+    # 5. Executa a consulta com todos os filtros aplicados
+    documentos = query.all()
+    
+    lista = []
+    for d in documentos:
+        # 6. Busca os nomes completos da Filial e Tipo para o Frontend
+        filial = Filial.query.get(d.filial_id)
+        tipo = TipoDocumento.query.get(d.tipo_id)
+        
+        lista.append({
+            "id": d.id,
+            "titulo": d.titulo,
+            "responsavel": d.responsavel,
+            "filial": filial.nome if filial else "", 
+            "tipo": tipo.nome if tipo else "", 
+            "validade": str(d.validade) if d.validade else "Sem Validade",
+            "status": d.status_calc, 
+        })
+    
     return jsonify(lista)
 
 # POST /documentos para cadastro
