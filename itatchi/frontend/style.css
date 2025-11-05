@@ -4,6 +4,7 @@
 .stApp header {
     background-color: white; 
     height: 3.5rem;
+    border-bottom: 1px solid #f1f1f1;
 }
 
 /* 2. ESCONDER LOGO PADRÃO DO STREAMLIT */
@@ -16,8 +17,9 @@
 /* 3. BARRA LATERAL INTEIRA */
 section[data-testid="stSidebar"] {
     background-color: #FF5C5C !important;
-    color: white; 
+    color: #FFFFFF !important;
     padding-top: 0;
+    font-family: 'Inter', Arial, sans-serif !important;
 }
 
 /* 4. ESTILO DOS LINKS INTERNOS (Contraste) */
@@ -28,32 +30,56 @@ section[data-testid="stSidebar"] {
 
 /* 5. ESTILO DOS LINKS INTERNOS */
 [data-testid="stSidebarNav"] > ul {
-    background-color: transparent !important; 
+    background-color: transparent !important;
     padding: 10px;
-    border-radius: 0; 
+    border-radius: 0;
 }
 
-/* 6. ESTILO DE BOTÃO (Complementa o primaryColor) */
+/* 5. BOTÕES */
 div.stButton > button:first-child {
-    color: white !important; 
+    color: #FFFFFF !important;
+    background-color: #FF5C5C !important;
+    border-radius: 999px !important;
+    border: none;
+    font-weight: 500;
 }
 
 /* 7. TÍTULOS */
 h1 {
-    color: #E64A19; 
+    color: #E64A19 !important; 
+    font-weight: 700;
+    font-family: 'Inter', Arial, sans-serif !important;
 }
 
 /* 8. CONTAINER DA LOGO */
 .logo-container {
-    position: fixed; 
-    top: 0.5rem;     
-    left: 1rem;      
-    z-index: 1000;    
+    position: fixed;
+    top: 0.5rem;
+    left: 1rem;
+    z-index: 1000;
 }
 
 /* 9. ESTILO DA IMAGEM */
 .logo-image {
-    height: 2.5rem; 
+    height: 2.5rem;
     width: auto;
-    filter: brightness(0) invert(1); 
+    filter: brightness(0) invert(1);
+}
+
+/* 9. FONTE GLOBAL */
+/* Fonte padrão para textos do app */
+html, body {
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+/* Não mexer na fonte dos ícones do Streamlit / Material */
+[data-baseweb="icon"],
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined', 'Material Icons Outlined', sans-serif !important;
+}
+
+
+/* Alinhamento à esquerda em todas as tabelas do Streamlit */
+div[data-testid="stTable"] table td {
+    text-align: left !important;
 }
