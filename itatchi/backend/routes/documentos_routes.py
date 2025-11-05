@@ -1,10 +1,16 @@
 from flask import Blueprint, jsonify, request
-from models.models import db, Documento, Filial, TipoDocumento 
-from datetime import datetime
-from logic.status_calculator import calcular_status
+from datetime import datetime, date
+
+from itatchi.backend.database.connection import db
+from itatchi.backend.models.models import Documento, Filial, TipoDocumento
+from ..logic.status_calculator import calcular_status
 
 documento_bp = Blueprint('documento_bp', __name__)
 
+
+# -----------------------------
+# GET /documentos  (lista simples)
+# -----------------------------
 @documento_bp.route('/documentos', methods=['GET'])
 def listar_documentos():
     # 1. Inicializa a consulta base
@@ -45,10 +51,13 @@ def listar_documentos():
     
     return jsonify(lista)
 
-# POST /documentos para cadastro
+
+# -----------------------------
+# POST /documentos  (cadastro)
+# -----------------------------
 @documento_bp.route('/documentos', methods=['POST'])
 def cadastrar_documento():
-    dados = request.get_json()
+    dados = request.get_json() or {}
 
     # 1. Validação mínima de campos obrigatórios
     # Requerimentos: titulo, responsavel, filial_id, tipo_id
@@ -103,3 +112,66 @@ def cadastrar_documento():
     except Exception as e:
         db.session.rollback()
         return jsonify({"erro": f"Erro interno ao salvar documento. {str(e)}"}), 500
+
+
+# -----------------------------
+# GET /home  (para Home)
+# -----------------------------
+@documento_bp.route("/home", methods=["GET"])
+def listar_alertas():
+    """
+    Retorna:
+      - documentos_relacionados: todos os documentos dentro do período/categoria
+      - proximos_vencimento: subset com status A_VENCER ou VENCIDO
+    Filtros via query string:
+      ?categoria=Regulatórios&inicio=2025-09-01&fim=2025-09-30
+    """
+
+    categoria = request.args.get("categoria")  # Regulatórios, Qualidade, ...
+    inicio_str = request.args.get("inicio")
+    fim_str = request.args.get("fim")
+
+    query = Documento.query.join(TipoDocumento, Documento.tipo_id == TipoDocumento.id)
+
+    # Filtro por categoria (opcional)
+    if categoria and categoria.lower() != "todas":
+        query = query.filter(TipoDocumento.categoria == categoria)
+
+    # Filtro por período de validade (opcional)
+    try:
+        if inicio_str:
+            data_inicio = datetime.strptime(inicio_str, "%Y-%m-%d").date()
+            query = query.filter(Documento.validade >= data_inicio)
+        if fim_str:
+            data_fim = datetime.strptime(fim_str, "%Y-%m-%d").date()
+            query = query.filter(Documento.validade <= data_fim)
+    except ValueError:
+        return jsonify({"erro": "Parâmetros de data inválidos. Use YYYY-MM-DD."}), 400
+
+    documentos = query.all()
+
+    documentos_relacionados = []
+    proximos_vencimento = []
+
+    for d in documentos:
+        item = {
+            "id": d.id,
+            "titulo": d.titulo,
+            "tipo_id": d.tipo_id,
+            "filial_id": d.filial_id,
+            "validade": d.validade.isoformat() if d.validade else None,
+            "status": d.status_calc,
+            "responsavel": d.responsavel,
+        }
+
+        documentos_relacionados.append(item)
+
+        if d.status_calc in ("A_VENCER", "VENCIDO"):
+            proximos_vencimento.append(item)
+
+    return jsonify(
+        {
+            "documentos_relacionados": documentos_relacionados,
+            "proximos_vencimento": proximos_vencimento,
+        }
+    )

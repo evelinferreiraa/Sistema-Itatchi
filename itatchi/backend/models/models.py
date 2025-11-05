@@ -1,4 +1,4 @@
-from database.connection import db
+from itatchi.backend.database.connection import db
 from sqlalchemy import Time
 
 class Filial(db.Model):
