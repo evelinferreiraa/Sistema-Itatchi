@@ -8,7 +8,7 @@ import pandas as pd
 import math
 from io import BytesIO
 
-from utils.ui_helpers import load_global_style   # aplica CSS + fonte Inter
+from utils.ui_helpers import load_global_style
 
 # ----------------------------------
 # CONFIGURAÇÃO GLOBAL / CSS
@@ -16,7 +16,6 @@ from utils.ui_helpers import load_global_style   # aplica CSS + fonte Inter
 st.set_page_config(layout="wide", page_title="Itatchi - Gerenciamento de Documentos")
 load_global_style()
 
-# Logo fixa no topo à esquerda (opcional)
 st.markdown(
     """
     <div class="logo-container">
@@ -79,6 +78,8 @@ with col_rel:
 if data_fim < data_inicio:
     st.error("⚠ A data final não pode ser menor que a data inicial.")
     st.stop()
+
+relatorio_placeholder = st.empty()
 
 # ==================================
 # 2. ESTADO GLOBAL (SESSION_STATE)
@@ -327,10 +328,12 @@ if botao_relatorio:
     docs_prox = st.session_state["docs_proximos"]
 
     if not docs_rel and not docs_prox:
-        st.warning("Não há documentos para gerar relatório.")
+        with relatorio_placeholder.container():
+            st.warning("Não há documentos para gerar relatório.")
     else:
-        # Junta relacionados + próximos e remove duplicados por ID (se existir)
+        # Junta relacionados + próximos e remove duplicados por id (se existir)
         todos = (docs_rel or []) + (docs_prox or [])
+
         if todos and isinstance(todos[0], dict) and "id" in todos[0]:
             dedup = {}
             for d in todos:
@@ -348,9 +351,11 @@ if botao_relatorio:
             df_full.to_excel(writer, index=False, sheet_name="Alertas")
         buffer.seek(0)
 
-        st.download_button(
-            label="⬇️ Baixar relatório em XLSX",
-            data=buffer,
-            file_name=f"relatorio_alertas_{data_inicio}_a_{data_fim}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        )
+        with relatorio_placeholder.container():
+            st.success("Relatório gerado com sucesso! Clique no botão abaixo para baixar o arquivo.")
+            st.download_button(
+                label="⬇️ Baixar relatório em Excel (.xlsx)",
+                data=buffer,
+                file_name=f"relatorio_alertas_{data_inicio}_a_{data_fim}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
