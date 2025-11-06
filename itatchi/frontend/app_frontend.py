@@ -6,16 +6,15 @@ import requests
 from datetime import date, datetime
 import calendar
 import pandas as pd
-
 from utils.ui_helpers import load_global_style   # ⬅ novo import
 
 # -----------------------------
 # CONFIGURAÇÃO GLOBAL / CSS
 # -----------------------------
 st.set_page_config(layout="wide", page_title="Itatchi - Gerenciamento de Documentos")
-load_global_style()  # ⬅ aplica style.css + fonte Inter
+load_global_style()  
 
-# Logo (se quiser manter)
+
 st.markdown(
     """
     <div class="logo-container">

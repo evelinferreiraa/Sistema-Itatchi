@@ -68,19 +68,6 @@ h1 {
     filter: brightness(0) invert(1);
 }
 
-/* 9. FONTE GLOBAL */
-/* Fonte padrão para textos do app */
-html, body {
-    font-family: 'Inter', Arial, sans-serif;
-}
-
-/* Não mexer na fonte dos ícones do Streamlit / Material */
-[data-baseweb="icon"],
-.material-symbols-outlined {
-    font-family: 'Material Symbols Outlined', 'Material Icons Outlined', sans-serif !important;
-}
-
-
 /* Alinhamento à esquerda em todas as tabelas do Streamlit */
 div[data-testid="stTable"] table td {
     text-align: left !important;
