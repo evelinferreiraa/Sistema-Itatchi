@@ -3,8 +3,9 @@
 import streamlit as st
 import requests
 import pandas as pd
+from utils.ui_helpers import load_global_style
 
-st.set_page_config(page_title="Central de Alertas", layout="wide")
+load_global_style()
 
 API_URL = "http://localhost:5000"
 

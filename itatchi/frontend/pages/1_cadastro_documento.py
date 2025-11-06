@@ -3,8 +3,9 @@
 import streamlit as st
 import requests
 from datetime import datetime, date
+from utils.ui_helpers import load_global_style
 
-st.set_page_config(page_title="Cadastro de Documento")
+load_global_style()
 
 # URL do Backend Flask
 API_URL = "http://localhost:5000"
