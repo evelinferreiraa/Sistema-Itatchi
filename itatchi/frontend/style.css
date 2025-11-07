@@ -68,7 +68,69 @@ h1 {
     filter: brightness(0) invert(1);
 }
 
+/* 9. CALENDÁRIO */
+
 /* Alinhamento à esquerda em todas as tabelas do Streamlit */
 div[data-testid="stTable"] table td {
     text-align: left !important;
+}
+
+/* Marcador de alerta  */
+.calendar-alert-marker {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    color: #E64A19;
+}
+.alert-icon {
+    height: 35px !important;
+    width: 35px !important;
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+ .calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background-color: #ffffff;
+    font-size: 0.9rem;
+}
+.calendar-table th,
+.calendar-table td {
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    vertical-align: middle;
+    height: 48px;
+    padding: 4px;
+}
+.calendar-table th {
+    background-color: #fff5f5;
+    font-weight: 600;
+    color: #E64A19;
+}
+.calendar-table td.empty-cell {
+    background-color: #fafafa;
+}
+.calendar-marker-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+.calendar-marker-cell .alert-icon {
+    width: 18px;
+    height: 18px;
+}
+.calendar-marker-cell .alert-fallback {
+    color: #E64A19;
+    font-size: 1.1rem;
+}
+.calendar-marker-cell span {
+    line-height: 1;
+}
+.day-number {
+    display: inline-block;
 }

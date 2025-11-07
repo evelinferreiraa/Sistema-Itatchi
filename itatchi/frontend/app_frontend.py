@@ -8,7 +8,11 @@ import pandas as pd
 import math
 from io import BytesIO
 
-from utils.ui_helpers import load_global_style
+from utils.ui_helpers import load_global_style, load_image_b64
+
+# Carrega logo e ícone do calendário
+LOGO_B64 = load_image_b64("logo_itatchi.png")
+ALERT_ICON_B64 = load_image_b64("alert_marker.png")
 
 # ----------------------------------
 # CONFIGURAÇÃO GLOBAL / CSS
@@ -16,14 +20,16 @@ from utils.ui_helpers import load_global_style
 st.set_page_config(layout="wide", page_title="Itatchi - Gerenciamento de Documentos")
 load_global_style()
 
-st.markdown(
-    """
-    <div class="logo-container">
-        <img src="assets/logo_itatchi.png" class="logo-image">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Logo fixa no topo (usando base64 pra funcionar em qualquer ambiente)
+if LOGO_B64:
+    st.markdown(
+        f"""
+        <div class="logo-container">
+            <img src="data:image/png;base64,{LOGO_B64}" class="logo-image">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 API_URL = "http://localhost:5000"
 
@@ -113,17 +119,59 @@ def buscar_alertas():
 
         if resp.status_code == 200:
             data = resp.json()
-            docs_rel = data.get("documentos_relacionados", [])
-            docs_prox = data.get("proximos_vencimento", [])
+            # Listas “brutas” vindas do backend
+            docs_rel_all = data.get("documentos_relacionados", [])
+            docs_prox_all = data.get("proximos_vencimento", [])
 
-            # Filtro extra
-            if extra_opcao == "Somente próximos ao vencimento":
-                docs_prox = [d for d in docs_prox if d.get("status") == "A_VENCER"]
+            # --- PRIORIDADE DE STATUS ---
+            # 1 = VENCIDO      (vem primeiro)
+            # 2 = A_VENCER
+            # 99 = outros
+            prioridade_status = {"VENCIDO": 1, "A_VENCER": 2}
+
+            def sort_key(doc):
+                status = doc.get("status")
+                validade = doc.get("validade") or "9999-12-31"
+                return (prioridade_status.get(status, 99), validade)
+
+            # -----------------------------------------
+            # "Próximos ao vencimento" SEMPRE mostra todos
+            # (A_VENCER + VENCIDO vindos do backend),
+            # apenas ordenados com vencidos no topo
+            # -----------------------------------------
+            docs_prox_ordenados = sorted(docs_prox_all, key=sort_key)
+
+            # -----------------------------------------
+            # Filtro "Algo a mais?" atua SOMENTE em
+            # "Documentos relacionados"
+            # -----------------------------------------
+            if extra_opcao == "Todos":
+                # Todos, com vencidos no topo
+                docs_rel_filtrados = sorted(docs_rel_all, key=sort_key)
+
+            elif extra_opcao == "Somente próximos ao vencimento":
+                # Apenas A_VENCER
+                docs_rel_filtrados = [
+                    d for d in docs_rel_all if d.get("status") == "A_VENCER"
+                ]
+                docs_rel_filtrados = sorted(docs_rel_filtrados, key=sort_key)
+
             elif extra_opcao == "Somente vencidos":
-                docs_prox = [d for d in docs_prox if d.get("status") == "VENCIDO"]
+                # Apenas VENCIDO
+                docs_rel_filtrados = [
+                    d for d in docs_rel_all if d.get("status") == "VENCIDO"
+                ]
+                docs_rel_filtrados = sorted(docs_rel_filtrados, key=sort_key)
 
-            st.session_state["docs_relacionados"] = docs_rel
-            st.session_state["docs_proximos"] = docs_prox
+            else:
+                # fallback de segurança
+                docs_rel_filtrados = sorted(docs_rel_all, key=sort_key)
+
+            # Guarda nas variáveis de sessão:
+            # - relacionados filtrados conforme "Algo a mais"
+            # - proximos SEMPRE com todos (periodo + categoria)
+            st.session_state["docs_relacionados"] = docs_rel_filtrados
+            st.session_state["docs_proximos"] = docs_prox_ordenados
 
             # Reseta paginações
             st.session_state["relacionados_page"] = 1
@@ -202,7 +250,8 @@ def iterar_meses(inicio: date, fim: date):
 def desenhar_calendario(documentos_prox, inicio: date, fim: date):
     """
     Desenha calendário com paginação de mês.
-    Marca dias com documentos próximos/vencidos usando ⚠.
+    Marca dias com documentos próximos/vencidos usando o PNG
+    ou o ícone ⚠ como fallback.
     """
     st.markdown("### Calendário de vencimentos")
 
@@ -211,7 +260,8 @@ def desenhar_calendario(documentos_prox, inicio: date, fim: date):
         st.info("Período selecionado não contém meses válidos.")
         return
 
-    col_prev, col_label, col_next = st.columns([1, 4, 1])
+    # 4 colunas: prev | label | espaçador | next (bem à direita)
+    col_prev, col_label, col_spacer, col_next = st.columns([1, 4, 3, 1])
 
     idx = st.session_state.get("cal_page_home", 0)
 
@@ -225,7 +275,12 @@ def desenhar_calendario(documentos_prox, inicio: date, fim: date):
     st.session_state["cal_page_home"] = idx
     ano, mes = meses[idx]
     nome_mes = calendar.month_name[mes].capitalize()
-    col_label.markdown(f"#### {nome_mes} / {ano}")
+
+    # Centraliza o texto do mês
+    col_label.markdown(
+        f"<h5 style='text-align:center; margin-top:0.3rem;'>{nome_mes} / {ano}</h5>",
+        unsafe_allow_html=True,
+    )
 
     # Descobre dias com alerta nesse mês
     dias_com_alerta = set()
@@ -244,27 +299,54 @@ def desenhar_calendario(documentos_prox, inicio: date, fim: date):
         if dt_validade.year == ano and dt_validade.month == mes:
             dias_com_alerta.add(dt_validade.day)
 
+    # Monta matriz de células em HTML
     matriz = calendar.monthcalendar(ano, mes)
-    linhas = []
+    linhas_html = ""
     for semana in matriz:
-        linha = []
+        tds = ""
         for dia in semana:
             if dia == 0:
-                linha.append("")
-            elif dia in dias_com_alerta:
-                linha.append(f"⚠ {dia}")
+                tds += '<td class="empty-cell"></td>'
             else:
-                linha.append(str(dia))
-        linhas.append(linha)
+                if dia in dias_com_alerta:
+                    if ALERT_ICON_B64:
+                        cell_content = f"""
+                        <div class="calendar-marker-cell">
+                            <img src="data:image/png;base64,{ALERT_ICON_B64}" class="alert-icon" />
+                            <span>{dia}</span>
+                        </div>
+                        """
+                    else:
+                        cell_content = f"""
+                        <div class="calendar-marker-cell">
+                            <span class="alert-fallback">⚠</span>
+                            <span>{dia}</span>
+                        </div>
+                        """
+                else:
+                    cell_content = f"<span class='day-number'>{dia}</span>"
+
+                tds += f"<td>{cell_content}</td>"
+        linhas_html += f"<tr>{tds}</tr>"
 
     nomes_colunas = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
-    df_cal = pd.DataFrame(linhas, columns=nomes_colunas)
-    styler = df_cal.style.set_properties(**{"text-align": "left"})
-    st.table(styler)
+    thead = "".join(f"<th>{c}</th>" for c in nomes_colunas)
+
+    tabela_html = f"""
+    <table class="calendar-table">
+        <thead>
+            <tr>{thead}</tr>
+        </thead>
+        <tbody>
+            {linhas_html}
+        </tbody>
+    </table>
+    """
+
+    st.markdown(tabela_html, unsafe_allow_html=True)
 
     st.caption(
-        "Dias marcados com ⚠ indicam documentos próximos do vencimento ou já vencidos "
-        "no período selecionado."
+        "Dias marcados com o ícone indicam documentos próximos do vencimento ou já vencidos no período selecionado."
     )
 
 # ==================================
@@ -327,35 +409,56 @@ if botao_relatorio:
     docs_rel = st.session_state["docs_relacionados"]
     docs_prox = st.session_state["docs_proximos"]
 
-    if not docs_rel and not docs_prox:
-        with relatorio_placeholder.container():
+    # Sufixo do nome do arquivo conforme filtro
+    filtro_slug = {
+        "Todos": "todos",
+        "Somente próximos ao vencimento": "a_vencer",
+        "Somente vencidos": "vencidos",
+    }.get(extra_opcao, "todos")
+
+    with relatorio_placeholder.container():
+        if not docs_rel and not docs_prox:
             st.warning("Não há documentos para gerar relatório.")
-    else:
-        # Junta relacionados + próximos e remove duplicados por id (se existir)
-        todos = (docs_rel or []) + (docs_prox or [])
-
-        if todos and isinstance(todos[0], dict) and "id" in todos[0]:
-            dedup = {}
-            for d in todos:
-                did = d.get("id")
-                if did not in dedup:
-                    dedup[did] = d
-            todos_final = list(dedup.values())
         else:
-            todos_final = todos
+            # Junta relacionados (já filtrados) + próximos (sempre todos do período)
+            todos = (docs_rel or []) + (docs_prox or [])
 
-        df_full = pd.DataFrame(todos_final)
+            # Remove duplicados por id, se existir
+            if todos and isinstance(todos[0], dict) and "id" in todos[0]:
+                dedup = {}
+                for d in todos:
+                    did = d.get("id")
+                    if did is not None and did not in dedup:
+                        dedup[did] = d
+                todos_final = list(dedup.values())
+            else:
+                todos_final = todos
 
-        buffer = BytesIO()
-        with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
-            df_full.to_excel(writer, index=False, sheet_name="Alertas")
-        buffer.seek(0)
+            # Mesmo critério de prioridade utilizado na tela:
+            # VENCIDO primeiro, depois A_VENCER, depois demais
+            prioridade_status = {"VENCIDO": 1, "A_VENCER": 2}
 
-        with relatorio_placeholder.container():
+            def sort_key(doc):
+                status = doc.get("status")
+                validade = doc.get("validade") or "9999-12-31"
+                return (prioridade_status.get(status, 99), validade)
+
+            todos_ordenados = sorted(todos_final, key=sort_key)
+
+            df_full = pd.DataFrame(todos_ordenados)
+
+            buffer = BytesIO()
+            with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+                df_full.to_excel(writer, index=False, sheet_name="Alertas")
+            buffer.seek(0)
+
             st.success("Relatório gerado com sucesso! Clique no botão abaixo para baixar o arquivo.")
             st.download_button(
                 label="⬇️ Baixar relatório em Excel (.xlsx)",
                 data=buffer,
-                file_name=f"relatorio_alertas_{data_inicio}_a_{data_fim}.xlsx",
+                file_name=(
+                    f"relatorio_alertas_{filtro_slug}_"
+                    f"{data_inicio.strftime('%Y%m%d')}_a_{data_fim.strftime('%Y%m%d')}.xlsx"
+                ),
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )

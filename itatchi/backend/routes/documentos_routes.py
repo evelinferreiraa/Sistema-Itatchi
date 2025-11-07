@@ -1,3 +1,5 @@
+# itatchi/backend/routes/documentos_routes.py
+
 from flask import Blueprint, jsonify, request
 from datetime import datetime, date
 
@@ -13,42 +15,52 @@ documento_bp = Blueprint('documento_bp', __name__)
 # -----------------------------
 @documento_bp.route('/documentos', methods=['GET'])
 def listar_documentos():
-    # 1. Inicializa a consulta base
+    # 1. Inicializa a consulta base (sem filtro de status por enquanto)
     query = Documento.query
-    
-    # 2. Obtém parâmetros de filtro da URL
+
+    # Parâmetros da URL
     status_filtro = request.args.get('status')
     titulo_filtro = request.args.get('titulo')
-    
-    # 3. Aplica o filtro de STATUS
-    # Apenas se o parâmetro 'status' for fornecido na URL 
-    if status_filtro:
-        query = query.filter(Documento.status_calc == status_filtro)
-    
-    # 4. Aplica o filtro de TÍTULO
-    # Apenas se o parametro 'titulo' for fornecido na URL
-    if titulo_filtro:
-        query = query.filter(Documento.titulo.ilike(f'%{titulo_filtro}%')) 
 
-    # 5. Executa a consulta com todos os filtros aplicados
+    # Filtro por título na query SQL
+    if titulo_filtro:
+        query = query.filter(Documento.titulo.ilike(f'%{titulo_filtro}%'))
+
     documentos = query.all()
-    
+
+    # 2. Recalcula status de todos os documentos retornados
+    houve_mudanca = False
+    hoje = date.today()
+
+    for d in documentos:
+        nova_situacao = calcular_status(d.validade)
+        if nova_situacao != d.status_calc:
+            d.status_calc = nova_situacao
+            houve_mudanca = True
+
+    if houve_mudanca:
+        db.session.commit()
+
+    # 3. Se veio filtro de status, aplica agora em memória
+    if status_filtro:
+        documentos = [d for d in documentos if d.status_calc == status_filtro]
+
+    # 4. Monta a resposta
     lista = []
     for d in documentos:
-        # 6. Busca os nomes completos da Filial e Tipo para o Frontend
         filial = Filial.query.get(d.filial_id)
         tipo = TipoDocumento.query.get(d.tipo_id)
-        
+
         lista.append({
             "id": d.id,
             "titulo": d.titulo,
             "responsavel": d.responsavel,
-            "filial": filial.nome if filial else "", 
-            "tipo": tipo.nome if tipo else "", 
+            "filial": filial.nome if filial else "",
+            "tipo": tipo.nome if tipo else "",
             "validade": str(d.validade) if d.validade else "Sem Validade",
-            "status": d.status_calc, 
+            "status": d.status_calc,
         })
-    
+
     return jsonify(lista)
 
 
@@ -123,8 +135,6 @@ def listar_alertas():
     Retorna:
       - documentos_relacionados: todos os documentos dentro do período/categoria
       - proximos_vencimento: subset com status A_VENCER ou VENCIDO
-    Filtros via query string:
-      ?categoria=Regulatórios&inicio=2025-09-01&fim=2025-09-30
     """
 
     categoria = request.args.get("categoria")  # Regulatórios, Qualidade, ...
@@ -150,6 +160,18 @@ def listar_alertas():
 
     documentos = query.all()
 
+    # 1. Recalcula status de todos do período
+    houve_mudanca = False
+    for d in documentos:
+        nova_situacao = calcular_status(d.validade)
+        if nova_situacao != d.status_calc:
+            d.status_calc = nova_situacao
+            houve_mudanca = True
+
+    if houve_mudanca:
+        db.session.commit()
+
+    # 2. Monta resposta já com status atualizados
     documentos_relacionados = []
     proximos_vencimento = []
 
