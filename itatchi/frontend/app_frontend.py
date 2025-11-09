@@ -8,35 +8,20 @@ import calendar
 import pandas as pd
 import math
 from io import BytesIO
-import os
+# Importa 'os' apenas se for estritamente necessário para outras partes do código
 from typing import List, Dict, Any, Optional, Generator, Tuple
 
 # Importa helpers
-from utils.ui_helpers import load_global_style, load_image_b64
+from utils.ui_helpers import load_global_style, load_image_b64, setup_logo
 
-# --- CONFIGURAÇÕES DE CAMINHO ---
-current_dir = os.path.dirname(os.path.abspath(__file__))
-ASSETS_DIR = os.path.join(current_dir, "assets")         
-LOGO_PATH = os.path.join(ASSETS_DIR, "logo_itatchi.png") # Caminho para a logo
+# 1. Configura a página (incluindo st.set_page_config e st.logo)
+setup_logo() 
 
-# Carrega ícone de alerta em Base64
+# 2. Carrega ícone de alerta (usa caminhos definidos internamente em ui_helpers)
 ALERT_ICON_B64: Optional[str] = load_image_b64("alert_marker.png")
 
-# ----------------------------------
-# CONFIGURAÇÃO GLOBAL / CSS
-# ----------------------------------
-st.set_page_config(layout="wide", page_title="Itatchi - Gerenciamento de Documentos")
+# 3. Carrega o CSS global
 load_global_style()
-
-# --- IMPLEMENTAÇÃO COM st.logo ---
-if os.path.exists(LOGO_PATH):
-    st.logo(
-        LOGO_PATH,
-        size="large",
-        icon_image=LOGO_PATH 
-    )
-else:
-    st.warning(f"⚠️ Arquivo da logo não encontrado em: {LOGO_PATH}")
 
 API_URL = "http://localhost:5000"
 
@@ -131,13 +116,12 @@ def buscar_alertas():
             docs_prox_all: List[Dict[str, Any]] = data.get("proximos_vencimento", [])
 
             # --- PRIORIDADE DE STATUS PARA ORDENAÇÃO ---
-            # VENCIDO = 1 (vem primeiro), A_VENCER = 2, outros = 99
             prioridade_status: Dict[str, int] = {"VENCIDO": 1, "A_VENCER": 2}
 
             def sort_key(doc: Dict[str, Any]) -> Tuple[int, str]:
                 """Chave de ordenação: por status prioritário, depois por data de validade."""
                 status: Optional[str] = doc.get("status")
-                validade: str = doc.get("validade") or "9999-12-31" # Default para documentos sem validade
+                validade: str = doc.get("validade") or "9999-12-31"
                 return (prioridade_status.get(status, 99), validade)
 
             # 1. Próximos ao vencimento: SEMPRE mostra todos (A_VENCER + VENCIDO), ordenados

@@ -5,10 +5,13 @@ import streamlit as st
 from pathlib import Path
 import base64
 from typing import Optional
+import os
 
 # Define o diretório base como a pasta "frontend"
 BASE_DIR = Path(__file__).resolve().parent.parent      # .../itatchi/frontend
 ASSETS_DIR = BASE_DIR / "assets"                       # .../itatchi/frontend/assets
+# Caminho da logo
+LOGO_PATH = os.path.join(ASSETS_DIR, "logo_itatchi.png")
 
 # ----------------------------------
 # 1. FUNÇÃO PARA APLICAR O CSS GLOBAL
@@ -46,3 +49,23 @@ def load_image_b64(filename: str) -> Optional[str]:
     except FileNotFoundError:
         st.warning(f"⚠️ Imagem não encontrada: {path}")
         return None
+    
+# ----------------------------------
+# 3. FUNÇÃO PARA EXIBIR A LOGO
+# ----------------------------------
+def setup_logo():
+    """Configura e exibe a logo na barra superior e na sidebar usando st.logo."""
+    
+    # Verifica se o arquivo existe
+    if os.path.exists(LOGO_PATH):
+        st.logo(
+            LOGO_PATH,
+            size="large",
+            icon_image=LOGO_PATH 
+        )
+    else:
+        # Usa um aviso na própria sidebar se a logo não for encontrada
+        st.sidebar.warning(f"⚠️ Arquivo da logo não encontrado em: {LOGO_PATH}")
+        
+    # Também configura a página aqui para garantir que st.set_page_config seja chamado primeiro
+    st.set_page_config(layout="wide", page_title="Itatchi - Gerenciamento de Documentos")

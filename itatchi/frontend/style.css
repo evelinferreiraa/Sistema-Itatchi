@@ -39,14 +39,23 @@ div.stButton > button:first-child {
     font-weight: 500;
 }
 
-/* 6. TÍTULOS PRINCIPAIS (H1) */
+/* 6. BOTÃO DE SUBMISSÃO DE FORMULÁRIO */
+div[data-testid="stFormSubmitButton"] > button {
+    color: #FFFFFF !important;
+    background-color: #FF5C5C !important;
+    border-radius: 999px !important;
+    border: none;
+    font-weight: 500;
+}
+
+/* 7. TÍTULOS PRINCIPAIS (H1) */
 h1 {
     color: #FF5C5C !important; /* Cor secundária (laranja) */
     font-weight: 700;
     font-family: 'Inter', Arial, sans-serif !important;
 }
 
-/* 7. ESTILOS ESPECÍFICOS DO CALENDÁRIO */
+/* 8. ESTILOS ESPECÍFICOS DO CALENDÁRIO */
 
 /* Alinhamento à esquerda em todas as tabelas do Streamlit */
 div[data-testid="stTable"] table td {
@@ -111,4 +120,45 @@ div[data-testid="stTable"] table td {
 }
 .day-number {
     display: inline-block;
+}
+
+/* 9. RENOMEAR PÁGINAS DA SIDEBAR */
+
+[data-testid="stSidebarNav"] a * {
+    visibility: hidden;
+    width: 0;
+    height: 0; 
+}
+
+[data-testid="stSidebarNav"] a {
+    position: relative;
+    padding-left: 1.5rem; 
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    display: flex; 
+    align-items: center; 
+}
+
+[data-testid="stSidebarNav"] a::before {
+    visibility: visible;
+    position: static; 
+    font-size: 16px;
+    font-weight: 500; 
+    color: white;
+    margin-left: -1rem; 
+}
+
+/* Página 1: app_frontend.py */
+[data-testid="stSidebarNav"] li:nth-child(1) a::before {
+    content: "INÍCIO";
+}
+
+/* Página 2: 1_cadastro_documento.py */
+[data-testid="stSidebarNav"] li:nth-child(2) a::before {
+    content: "CADASTRO DE DOCUMENTOS";
+}
+
+/* Página 3: 2_central_de_alertas.py */
+[data-testid="stSidebarNav"] li:nth-child(3) a::before {
+    content: "CENTRAL DE ALERTAS";
 }

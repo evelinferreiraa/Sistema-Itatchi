@@ -6,8 +6,10 @@ import requests
 import pandas as pd
 from typing import List, Dict, Any
 
-from utils.ui_helpers import load_global_style
+from utils.ui_helpers import load_global_style, setup_logo
 
+# --- CONFIGURAÇÃO GLOBAL / CSS E LOGO ---
+setup_logo() 
 load_global_style()
 
 API_URL = "http://localhost:5000"

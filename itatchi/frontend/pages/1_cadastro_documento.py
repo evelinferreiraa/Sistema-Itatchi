@@ -6,9 +6,10 @@ import requests
 from datetime import datetime, date
 from typing import Optional, Dict, Any
 
-from utils.ui_helpers import load_global_style
+from utils.ui_helpers import load_global_style, setup_logo
 
-# Aplica os estilos globais
+# --- CONFIGURAÇÃO GLOBAL / CSS E LOGO ---
+setup_logo() 
 load_global_style()
 
 # URL do Backend Flask
