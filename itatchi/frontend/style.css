@@ -2,42 +2,35 @@
 /* Importa a fonte Inter diretamente do Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
 
-/* 1. CABEÇALHO/BARRA SUPERIOR */
+/* 1. CABEÇALHO/BARRA SUPERIOR (Streamlit) */
 .stApp header {
     background-color: white; 
     height: 3.5rem;
     border-bottom: 1px solid #f1f1f1;
 }
 
-/* 2. ESCONDER LOGO PADRÃO DO STREAMLIT */
-.css-1rs60co, .st-emotion-cache-1oe5f0g { 
-    visibility: hidden;
-    height: 0%;
-    position: fixed;
-}
-
-/* 3. BARRA LATERAL INTEIRA */
+/* 2. BARRA LATERAL INTEIRA (Sidebar) */
 section[data-testid="stSidebar"] {
-    background-color: #FF5C5C !important;
+    background-color: #FF5C5C !important; /* Cor principal Itatchi */
     color: #FFFFFF !important;
     padding-top: 0;
     font-family: 'Inter', Arial, sans-serif !important;
 }
 
-/* 4. ESTILO DOS LINKS INTERNOS (Contraste) */
+/* 3. ESTILO DOS LINKS INTERNOS (Contraste) */
 [data-testid="stSidebarNav"] a {
     color: white !important; 
     font-weight: 500;
 }
 
-/* 5. ESTILO DOS LINKS INTERNOS */
+/* 4. ESTILO DOS LINKS INTERNOS */
 [data-testid="stSidebarNav"] > ul {
     background-color: transparent !important;
     padding: 10px;
     border-radius: 0;
 }
 
-/* 5. BOTÕES */
+/* 5. BOTÕES PADRÃO (Estilo Itatchi) */
 div.stButton > button:first-child {
     color: #FFFFFF !important;
     background-color: #FF5C5C !important;
@@ -46,29 +39,14 @@ div.stButton > button:first-child {
     font-weight: 500;
 }
 
-/* 7. TÍTULOS */
+/* 6. TÍTULOS PRINCIPAIS (H1) */
 h1 {
-    color: #E64A19 !important; 
+    color: #FF5C5C !important; /* Cor secundária (laranja) */
     font-weight: 700;
     font-family: 'Inter', Arial, sans-serif !important;
 }
 
-/* 8. CONTAINER DA LOGO */
-.logo-container {
-    position: fixed;
-    top: 0.5rem;
-    left: 1rem;
-    z-index: 1000;
-}
-
-/* 9. ESTILO DA IMAGEM */
-.logo-image {
-    height: 2.5rem;
-    width: auto;
-    filter: brightness(0) invert(1);
-}
-
-/* 9. CALENDÁRIO */
+/* 7. ESTILOS ESPECÍFICOS DO CALENDÁRIO */
 
 /* Alinhamento à esquerda em todas as tabelas do Streamlit */
 div[data-testid="stTable"] table td {
@@ -81,7 +59,7 @@ div[data-testid="stTable"] table td {
     align-items: center;
     gap: 4px;
     font-weight: 500;
-    color: #E64A19;
+    color: #FF5C5C;
 }
 .alert-icon {
     height: 35px !important;
@@ -90,7 +68,7 @@ div[data-testid="stTable"] table td {
     margin-right: 2px;
 }
 
- .calendar-table {
+.calendar-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
@@ -108,7 +86,7 @@ div[data-testid="stTable"] table td {
 .calendar-table th {
     background-color: #fff5f5;
     font-weight: 600;
-    color: #E64A19;
+    color: #FF5C5C;
 }
 .calendar-table td.empty-cell {
     background-color: #fafafa;
@@ -125,7 +103,7 @@ div[data-testid="stTable"] table td {
     height: 18px;
 }
 .calendar-marker-cell .alert-fallback {
-    color: #E64A19;
+    color: #FF5C5C;
     font-size: 1.1rem;
 }
 .calendar-marker-cell span {
