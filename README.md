@@ -29,30 +29,32 @@ O projeto visa:
 
 A arquitetura é modular e separa claramente as responsabilidades entre **backend (Flask)** e **frontend (Streamlit)**:
 
+'''
 itatchi/
 ├── backend/
-│ ├── app_backend.py # Inicialização do servidor Flask
-│ ├── routes/
-│ │ └── documentos_routes.py # Rotas da API e atualização automática de status
-│ ├── logic/
-│ │ └── status_calculator.py # Cálculo de status (vigente, a vencer, vencido)
-│ ├── models/ # Modelos de dados com SQLAlchemy
-│ └── database/
-│ └── connection.py # Configuração de conexão com banco MySQL/SQLite
+│   ├── app_backend.py                 # Inicialização do servidor Flask
+│   ├── routes/
+│   │   └── documentos_routes.py       # Rotas da API e atualização automática de status
+│   ├── logic/
+│   │   └── status_calculator.py       # Cálculo de status (vigente, a vencer, vencido)
+│   ├── models/                        # Modelos de dados com SQLAlchemy
+│   └── database/
+│       └── connection.py              # Configuração de conexão com banco MySQL/SQLite
 │
 ├── frontend/
-│ ├── app_frontend.py # Página principal (Central de Consultas)
-│ ├── pages/
-│ │ ├── 1_cadastro_documento.py
-│ │ └── 2_central_de_alertas.py
-│ ├── utils/
-│ │ └── ui_helpers.py # Funções auxiliares (CSS, imagens base64)
-│ ├── style.css # Estilos globais do sistema
-│ └── assets/
-│ ├── logo_itatchi.png
-│ └── alert_marker.png
+│   ├── app_frontend.py                # Página principal (Central de Consultas)
+│   ├── pages/
+│   │   ├── 1_cadastro_documento.py
+│   │   └── 2_central_de_alertas.py
+│   ├── utils/
+│   │   └── ui_helpers.py              # Funções auxiliares (CSS, imagens base64)
+│   ├── style.css                      # Estilos globais do sistema
+│   └── assets/
+│       ├── logo_itatchi.png
+│       └── alert_marker.png
 │
 └── README.md
+'''
 
 ---
 
