@@ -29,6 +29,7 @@ O projeto visa:
 
 A arquitetura é modular e separa claramente as responsabilidades entre **backend (Flask)** e **frontend (Streamlit)**:
 
+```
 itatchi/
 ├── backend/
 │   ├── app_backend.py                 # Inicialização do servidor Flask
@@ -53,6 +54,7 @@ itatchi/
 │       └── alert_marker.png
 │
 └── README.md
+```
 
 ---
 
