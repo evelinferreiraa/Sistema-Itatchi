@@ -5,9 +5,13 @@ from flask import Blueprint, jsonify, request, Response
 from datetime import datetime, date
 from typing import Any, Dict, List, Optional, Tuple
 
-from itatchi.backend.database.connection import db
-from itatchi.backend.models.models import Documento, Filial, TipoDocumento
-from ..logic.status_calculator import calcular_status
+# from itatchi.backend.database.connection import db
+# from itatchi.backend.models.models import Documento, Filial, TipoDocumento
+# from ..logic.status_calculator import calcular_status
+
+from database.connection import db
+from models.models import Documento, Filial, TipoDocumento
+from logic.status_calculator import calcular_status
 
 documento_bp = Blueprint('documento_bp', __name__)
 

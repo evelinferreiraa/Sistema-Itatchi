@@ -1,6 +1,6 @@
 # itatchi/frontend/app_frontend.py
 # Página principal do frontend (Central de Consultas), com filtros, tabelas paginadas e calendário.
-
+import os
 import streamlit as st
 import requests
 from datetime import date, datetime
@@ -23,7 +23,7 @@ ALERT_ICON_B64: Optional[str] = load_image_b64("alert_marker.png")
 # 3. Carrega o CSS global
 load_global_style()
 
-API_URL = "http://localhost:5000"
+API_URL = os.getenv("API_URL", "http://localhost:5000")
 
 # ----------------------------------
 # TÍTULO / DESCRIÇÃO

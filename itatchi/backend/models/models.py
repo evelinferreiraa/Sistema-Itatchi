@@ -1,7 +1,8 @@
 # itatchi/backend/models/models.py
 # Definição dos modelos de dados (tabelas) usando SQLAlchemy ORM.
 
-from itatchi.backend.database.connection import db
+# from itatchi.backend.database.connection import db
+from database.connection import db
 from sqlalchemy import Time, Text, Date, Boolean, String, Integer, ForeignKey
 
 

@@ -2,7 +2,15 @@ streamlit==1.39.0
 flask==3.0.3
 flask-cors==4.0.0
 sqlalchemy==2.0.34
+flask_sqlalchemy==3.1.1
 pandas==2.2.2
 requests==2.32.3
 xlsxwriter==3.2.0
 python-dotenv==1.0.1
+sqlalchemy==2.0.34
+pymysql==1.1.1
+pandas==2.2.2
+requests==2.32.3
+xlsxwriter==3.2.0
+python-dotenv==1.0.1
+cryptography==43.0.3

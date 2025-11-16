@@ -1,6 +1,7 @@
 from datetime import date
 import json
-from ..models.models import Parametro 
+# from ..models.models import Parametro 
+from models.models import Parametro
 
 def calcular_status(data_validade):
     """
