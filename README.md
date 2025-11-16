@@ -116,3 +116,6 @@ A metodologia de desenvolvimento seguiu o **Design Thinking**, estruturada em ci
 ```bash
 git clone https://github.com/usuario/sistema-itatchi.git
 cd sistema-itatchi
+
+### Após instalar o Docker desktop e deiixar ele aberto, execute o comando abaixo
+docker compose up --build
