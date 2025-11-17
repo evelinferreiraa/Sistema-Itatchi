@@ -1,6 +1,7 @@
 # itatchi/frontend/pages/2_central_de_alertas.py
 # Página Streamlit para a Central de Alertas (Visualização de VENCIDO e A_VENCER).
 
+import os
 import streamlit as st
 import requests
 import pandas as pd
@@ -12,7 +13,7 @@ from utils.ui_helpers import load_global_style, setup_logo
 setup_logo() 
 load_global_style()
 
-API_URL = "http://localhost:5000"
+API_URL = os.getenv("API_URL", "http://localhost:5000")
 
 st.title("Central de Alertas")
 

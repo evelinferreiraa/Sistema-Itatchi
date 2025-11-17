@@ -1,6 +1,6 @@
 # itatchi/frontend/pages/1_cadastro_documento.py
 # Página Streamlit para o formulário de cadastro de novos documentos.
-
+import os
 import streamlit as st
 import requests
 from datetime import datetime, date
@@ -12,8 +12,8 @@ from utils.ui_helpers import load_global_style, setup_logo
 setup_logo() 
 load_global_style()
 
-# URL do Backend Flask
-API_URL: str = "http://localhost:5000"
+# URL do Backend Flask no container
+API_URL: str = os.getenv("API_URL", "http://localhost:5000")
 
 # --- Dados Iniciais Mockados (devem ser substituídos por chamadas à API) ---
 OPCOES_FILIAIS: Dict[int, str] = {1: "Matriz São Paulo"} 

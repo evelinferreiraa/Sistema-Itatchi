@@ -92,6 +92,7 @@ def cadastrar_documento() -> Tuple[Response, int]:
         - JSON: Mensagem de erro (400 Bad Request ou 500 Internal Error).
     """
     dados: Dict[str, Any] = request.get_json() or {}
+    print("JSON recebido no /documentos:", dados)  # LOG PARA DEBUG
 
     # 1. Validação mínima de campos obrigatórios
     required_fields = ['titulo', 'responsavel', 'filial_id', 'tipo_id']
@@ -145,6 +146,7 @@ def cadastrar_documento() -> Tuple[Response, int]:
     except Exception as e:
         # Em caso de erro, reverte a transação
         db.session.rollback()
+        print("Erro ao salvar documento:", e)
         return jsonify({"erro": f"Erro interno ao salvar documento. {str(e)}"}), 500
 
 

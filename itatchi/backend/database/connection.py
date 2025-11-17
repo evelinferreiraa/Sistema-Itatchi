@@ -27,7 +27,7 @@ def create_app():
     # 1. Obter variáveis de conexão do ambiente (.env local ou variáveis do Docker)
     db_user = os.getenv("DB_USER", "itatchi_user")
     db_password = os.getenv("DB_PASSWORD", "itatchi_pass")
-    db_host = os.getenv("DB_HOST", "localhost")
+    db_host = os.getenv("DB_HOST", "itatchi-mysql")
     db_port = os.getenv("DB_PORT", "3306")
     db_name = os.getenv("DB_NAME", "itatchi_db")
 
