@@ -12,10 +12,17 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
+    deploy:
+      mode: replicated
+      replicas: 1  
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
 
   backend:
-    build: ./backend
-    restart: always
+    image: itatchi-backend 
     depends_on:
       - mysql
     ports:
@@ -27,9 +34,18 @@ services:
       - DB_USER=itatchi_user
       - DB_PASSWORD=itatchi_pass
       - DB_NAME=itatchi_db
+    deploy:
+      mode: replicated
+      replicas: 2   
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+           - node.role == manager 
+
 
   frontend:
-    build: ./frontend
+    image: itatchi-frontend
     depends_on:
       - backend
     ports:
@@ -37,9 +53,24 @@ services:
     environment:
       - API_URL=http://backend:5000
     deploy:
-      replicas: 2
+      mode: replicated
+      replicas: 2   
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+           - node.role == manager 
+
+  visualizer:
+    image: dockersamples/visualizer:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"  
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
 volumes:
   mysql-data:
