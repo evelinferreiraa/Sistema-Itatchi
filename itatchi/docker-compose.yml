@@ -3,15 +3,16 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
       MYSQL_DATABASE: itatchi_db
       MYSQL_USER: itatchi_user
-      MYSQL_PASSWORD: itatchi_pass
-    ports:
-      - "3306:3306"
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_user_password
     volumes:
       - ./mysql-data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
+    secrets:
+    - mysql_root_password
+    - mysql_user_password
     deploy:
       mode: replicated
       replicas: 1  
@@ -32,8 +33,9 @@ services:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=itatchi_user
-      - DB_PASSWORD=itatchi_pass
       - DB_NAME=itatchi_db
+    secrets:
+      - mysql_user_password
     deploy:
       mode: replicated
       replicas: 2   
@@ -42,7 +44,6 @@ services:
       placement:
         constraints:
            - node.role == manager 
-
 
   frontend:
     image: itatchi-frontend
@@ -74,3 +75,9 @@ services:
 
 volumes:
   mysql-data:
+
+secrets:
+  mysql_root_password:
+    external: true
+  mysql_user_password:
+    external: true

@@ -13,6 +13,19 @@ load_dotenv()
 # Objeto global de banco de dados (compartilhado pelos models)
 db = SQLAlchemy()
 
+def _read_secret(path: str) -> str | None:
+    """
+    Lê o conteúdo de um arquivo (secret do Docker).
+    Retorna a string sem quebras de linha, ou None se o arquivo não existir.
+    """
+    try:
+        with open(path, "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return None
+    except OSError:
+        # Qualquer outro erro de leitura, simplesmente não usa o secret
+        return None
 
 def create_app():
     """
@@ -26,12 +39,18 @@ def create_app():
 
     # 1. Obter variáveis de conexão do ambiente (.env local ou variáveis do Docker)
     db_user = os.getenv("DB_USER", "itatchi_user")
-    db_password = os.getenv("DB_PASSWORD", "itatchi_pass")
     db_host = os.getenv("DB_HOST", "itatchi-mysql")
     db_port = os.getenv("DB_PORT", "3306")
     db_name = os.getenv("DB_NAME", "itatchi_db")
 
-    # 2. Montar a URL de conexão para MySQL + PyMySQL
+    # 2. Tentar ler a senha a partir do Docker Secret
+    # Caminho padrão onde o Swarm monta o secret:
+    secret_password = _read_secret("/run/secrets/mysql_app_password")
+
+    # Se o secret não existir (desenvolvimento local), usar DB_PASSWORD do ambiente
+    db_password = secret_password 
+
+    # 3. Montar a URL de conexão para MySQL + PyMySQL
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
     )
